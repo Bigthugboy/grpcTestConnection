@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package payment;
+option go_package ="server/payment" ;
+
+
+message Account {
+  string bankCode = 1;
+  string accountNumber = 2;
+  string commonName = 3;
+  string accountName = 4;
+}
+
+message AddDebitAccountRequest {
+  repeated Account accounts = 1;
+}
+
+message AddDebitAccountResponse {
+  string message = 1;
+  bool success = 2;
+}
+
+service AddDebitAccountService {
+  rpc AddDebitAccount (AddDebitAccountRequest) returns (AddDebitAccountResponse);
+}
