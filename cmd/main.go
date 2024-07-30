@@ -2,24 +2,26 @@ package main
 
 import (
 	"google.golang.org/grpc"
-	"grpcTestConnection/server/payment/server/payment"
-	"grpcTestConnection/server/server"
+	"grpcTestConnection/server/grpcserver"
+	"grpcTestConnection/server/payment/grpcserver/payment"
 	"log"
 	"net"
 )
 
 func main() {
-	lis, err := net.Listen("tcp", ":50081")
+	const port = ":50081"
+
+	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
 	grpcServer := grpc.NewServer()
-	paymentServer := server.NewServer()
+	paymentServer := grpcserver.NewServer()
 
-	payment.RegisterAddDebitAccountServiceServer(grpcServer, paymentServer)
+	payment.RegisterInternalsServiceServer(grpcServer, paymentServer)
 
-	log.Println("gRPC server is running on port 50081")
+	log.Println("gRPC grpcServer is running on port 50081")
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

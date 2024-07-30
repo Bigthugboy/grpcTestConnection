@@ -1,10 +1,12 @@
 syntax = "proto3";
 
-package payment;
-option go_package ="server/payment" ;
+package com.example.grpc.Account;
 
+option go_package = "grpcserver/payment";
 
-message Account {
+import "google/protobuf/empty.proto";
+
+message DebitAccount {
   string bankCode = 1;
   string accountNumber = 2;
   string commonName = 3;
@@ -12,14 +14,121 @@ message Account {
 }
 
 message AddDebitAccountRequest {
-  repeated Account accounts = 1;
+  repeated DebitAccount accounts = 1;
 }
 
 message AddDebitAccountResponse {
   string message = 1;
+  string success = 2;
+}
+
+message AuthenticationRequest {
+  string client_id = 1;
+  string client_secret = 2;
+  string scope = 3;
+  string grant_type = 4;
+}
+
+message AuthenticationResponse {
+  string token_type = 1;
+  int64 expire_in = 2;
+  int64 ext_expires_in = 3;
+  string access_token = 4;
+}
+
+message Bank {
+  string name = 1;
+  string bankCode = 2;
+  string nipCode = 3;
+  bool active = 4;
+  string absSortCode = 5;
+  bool isOfi = 6;
+}
+
+message DebitData {
+  repeated Bank banks = 1;
+}
+
+message GetBankResponse {
+  DebitData data = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+message GetAccountListResponse {
+  repeated Data data = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+message  Data {
+  string accountNumber = 1;
+  string bankCode = 2;
+  string accountName = 3;
+  string accountMandateCode = 4;
+  string commonName = 5;
+  string bvn = 6;
+  int64 accountId = 7;
+  bool accountStatus = 8;
+}
+
+message VerifyAccountNameRequest {
+  string bankCode = 1;
+  string accountNumber = 2;
+}
+
+message VerifyAccountNameResponse {
+  VerifyData data = 1;
   bool success = 2;
 }
 
-service AddDebitAccountService {
+message VerifyData {
+  string accountName = 1;
+}
+
+message GetAllAccountBalanceResponse {
+  BalanceData data = 1;
+  bool success = 2;
+}
+
+message BalanceData {
+  repeated Balances balances = 1;
+}
+
+message Balances {
+  string accountName = 1;
+  string accountNumber = 2;
+  string accountMandateCode = 3;
+  string availableBalance = 4;
+  string commonName = 5;
+  bool success = 6;
+  string bank = 7;
+  bool accountStatus = 8;
+  string createdOn = 9;
+  string mandateStatus = 10;
+}
+
+message GetBankCodeResponse {
+  BankCodeData data = 1;
+  bool success = 2;
+}
+
+message BankCodeData {
+  string name = 1;
+  string bankCode = 2;
+  string nipCode = 3;
+  bool active = 4;
+  string abcSortCode = 5;
+  bool isOfi = 6;
+}
+
+
+service InternalsService {
   rpc AddDebitAccount (AddDebitAccountRequest) returns (AddDebitAccountResponse);
+  rpc GetBankList (google.protobuf.Empty) returns (GetBankResponse);
+  rpc GetAccountList (google.protobuf.Empty) returns (GetAccountListResponse);
+  rpc VerifyAccountName (VerifyAccountNameRequest) returns (VerifyAccountNameResponse);
+  rpc GetAllAccountBalance (google.protobuf.Empty) returns (GetAllAccountBalanceResponse);
+  rpc GetBankName (google.protobuf.Empty) returns (GetBankCodeResponse);
+  rpc Authenticate (AuthenticationRequest) returns (AuthenticationResponse);
 }
